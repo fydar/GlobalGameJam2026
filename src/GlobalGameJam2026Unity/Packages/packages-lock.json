@@ -175,6 +175,7 @@
       }
     },
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
     "com.unity.splines": {
       "version": "2.8.2",
@@ -188,6 +189,8 @@
       "url": "https://packages.unity.com"
     },
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     "com.unity.sysroot.base": {
