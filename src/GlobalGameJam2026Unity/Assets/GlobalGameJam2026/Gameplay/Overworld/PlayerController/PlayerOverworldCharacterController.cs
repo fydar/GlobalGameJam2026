@@ -6,7 +6,7 @@ namespace GlobalGameJam2026.Gameplay.Overworld.PlayerController
 {
     public class PlayerOverworldCharacterController : MonoBehaviour
     {
-        [SerializeField] private float movementSpeed;
+        [SerializeField] private OverworldCharacter overworldCharacter;
 
         [SerializeField] private InputActionReference analogMovement;
         [SerializeField] private InputActionReference orthogonalMovement;
@@ -18,36 +18,19 @@ namespace GlobalGameJam2026.Gameplay.Overworld.PlayerController
             var orthogonalInput = orthogonalMovement.action.ReadValue<Vector2>();
 
             // Decide which input to use. Prioritize orthogonal input if it's significant enough.
-            Vector2 input;
             if (orthogonalInput.magnitude > 0.5f)
             {
-                input = orthogonalInput;
+                // Prevent faster diagonal movement
+                orthogonalInput = Vector2.ClampMagnitude(orthogonalInput, 1);
+
+                overworldCharacter.MoveOrthogonally(orthogonalInput);
             }
-            else
+            else if (analogInput.magnitude > 0.0001f)
             {
-                input = analogInput;
+                // Prevent faster diagonal movement
+                analogInput = Vector2.ClampMagnitude(analogInput, 1);
 
-                // Rotate input by direction the camera is facing.
-                var camera = Camera.main;
-                if (camera != null)
-                {
-                    var cameraYRotation = Quaternion.Euler(0, camera.transform.eulerAngles.y, 0);
-                    input = cameraYRotation * new Vector3(input.x, 0, input.y);
-                }
-            }
-
-            // Prevent faster diagonal movement
-            input = Vector2.ClampMagnitude(input, 1);
-
-            var locomotion = new Vector3(input.x, 0, input.y);
-
-            // Move the character based on input
-            transform.position += movementSpeed * Time.deltaTime * locomotion;
-
-            // Snap position to NavMesh
-            if (NavMesh.SamplePosition(transform.position, out NavMeshHit myNavHit, 100, -1))
-            {
-                transform.position = myNavHit.position;
+                overworldCharacter.MoveAnalog(analogInput);
             }
         }
     }

@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 279805759256194788}
   - component: {fileID: 1136057847399757776}
   - component: {fileID: 7025181046752908547}
+  - component: {fileID: 2703734765297444286}
   m_Layer: 0
   m_Name: OverworldCharacter
   m_TagString: Untagged
@@ -160,6 +161,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9323d3ddb32eb9f4fa1c1f636152b01c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  animator: {fileID: 0}
+  movementSpeed: 0
+--- !u!114 &2703734765297444286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6453612071341430993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba976af565ecdfe4da0117221d01f932, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalGameJam2026.Gameplay.Overworld.PlayerController.PlayerOverworldCharacterController
+  overworldCharacter: {fileID: 7025181046752908547}
+  analogMovement: {fileID: 950635731630592206, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  orthogonalMovement: {fileID: 774833016952553089, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1 &8087772082905058657
 GameObject:
   m_ObjectHideFlags: 0
@@ -169,6 +187,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5768175789640445772}
+  - component: {fileID: 3642188037442844100}
   m_Layer: 0
   m_Name: Graphics
   m_TagString: Untagged
@@ -184,11 +203,33 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8087772082905058657}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.13052596, y: -0, z: -0, w: 0.99144495}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8961595756152409958}
   m_Father: {fileID: 279805759256194788}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -15, y: 0, z: 0}
+--- !u!95 &3642188037442844100
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8087772082905058657}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e534cb0fa26b8ae4da56457c76f63d73, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
