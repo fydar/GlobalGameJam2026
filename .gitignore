@@ -34,6 +34,8 @@ src/GlobalGameJam2026Unity/[Ll]ibrary/
 src/GlobalGameJam2026Unity/Assets/AssetStoreTools*
 src/GlobalGameJam2026Unity/Logs
 src/GlobalGameJam2026Unity/UserSettings
+src/GlobalGameJam2026Unity/.vsconfig
+src/GlobalGameJam2026Unity/.vscode
 
 !src/GlobalGameJam2026Unity/Assets/**/*.dll
 
@@ -56,4 +58,3 @@ Corridor/Library/ShaderCache/
 Corridor/Library/metadata/
 Project/Library/EditorInstance.json
 *.stamp
-src/GlobalGameJam2026Unity/.vsconfig
