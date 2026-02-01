@@ -91,7 +91,7 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    void Start()
+    void Awake()
     {
         tileTemplate.gameObject.SetActive(true);
         for (int x = 0; x < Map.Width; x++)
@@ -125,6 +125,8 @@ public class BattleController : MonoBehaviour
                 combatant.Team = team;
             }
         }
+
+        StartCoroutine(RunBattle());
     }
 
     public IEnumerator RunBattle()

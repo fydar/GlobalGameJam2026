@@ -8,14 +8,14 @@ public static class BootstrapperEntrypoint
     private static void Main()
     {
         var hostGameObject = new GameObject("Game");
-        host = hostGameObject.AddComponent<Host>();
+        // host = hostGameObject.AddComponent<Host>();
         Object.DontDestroyOnLoad(hostGameObject);
 
 #if UNITY_EDITOR
         Application.quitting += ApplicationQuitting;
 #endif
 
-        host.Initialize();
+        // host.Initialize();
     }
 
 #if UNITY_EDITOR
