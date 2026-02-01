@@ -174,9 +174,6 @@
         "com.unity.searcher": "4.9.3"
       }
     },
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
     "com.unity.splines": {
       "version": "2.8.2",
       "depth": 1,
@@ -188,11 +185,6 @@
       },
       "url": "https://packages.unity.com"
     },
-
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     "com.unity.sysroot.base": {
       "version": "1.0.2",
       "depth": 1,
