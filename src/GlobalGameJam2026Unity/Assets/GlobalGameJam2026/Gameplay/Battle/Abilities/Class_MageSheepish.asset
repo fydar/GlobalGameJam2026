@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a190e494edb1bc4f9261bd6d4f12afb, type: 3}
+  m_Name: Class_MageSheepish
+  m_EditorClassIdentifier: Assembly-CSharp::SheepishAbility
+  DisplayName: Sheepish
+  Icon: {fileID: 21300000, guid: 1247e8f0ed78b223a972eb58a9fc9750, type: 3}
+  sheepPrefab: {fileID: 6597131285941896190, guid: a79e675d67767a74b9a421f44e2c5ec5, type: 3}
+  cost:
+    actionPointsCost: 3

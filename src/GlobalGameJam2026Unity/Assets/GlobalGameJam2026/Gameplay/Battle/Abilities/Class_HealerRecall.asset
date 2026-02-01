@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Class_HealerRecall
   m_EditorClassIdentifier: Assembly-CSharp::SummonAbility
   DisplayName: Recall
-  Icon: {fileID: 0}
+  Icon: {fileID: 1406037072, guid: 031dc54038b37206f922a513894480da, type: 3}
   cost:
     actionPointsCost: 2
   launchHeight: 10

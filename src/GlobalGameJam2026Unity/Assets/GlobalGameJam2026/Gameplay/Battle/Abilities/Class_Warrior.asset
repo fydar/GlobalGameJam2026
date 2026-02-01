@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Class_Warrior
   m_EditorClassIdentifier: Assembly-CSharp::Class
   displayName: Warrior
+  characterName: Sir. Harold
   healthBarIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  characterCreatorIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  characterCreatorIcon: {fileID: 21300000, guid: d0d88572664f0f84fa49b347da639ca6, type: 3}
   DefaultActionPoints: 3
   MaxHealth: 150
   abilities:

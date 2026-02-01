@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Class_HealerMassHeal
   m_EditorClassIdentifier: Assembly-CSharp::MassHealAbility
   DisplayName: Bless
-  Icon: {fileID: 0}
+  Icon: {fileID: -780875135, guid: 031dc54038b37206f922a513894480da, type: 3}
   healAmount: 15
   cost:
     actionPointsCost: 2

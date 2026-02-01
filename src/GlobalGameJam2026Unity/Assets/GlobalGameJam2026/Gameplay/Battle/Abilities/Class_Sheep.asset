@@ -10,16 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6027a515c93a9704a9e68d456e72b927, type: 3}
-  m_Name: Class_Ranger
+  m_Name: Class_Sheep
   m_EditorClassIdentifier: Assembly-CSharp::Class
-  displayName: Ranger
-  characterName: Paddington & Minion
+  displayName: Sheep
+  characterName: Sheep
   healthBarIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  characterCreatorIcon: {fileID: 21300000, guid: ed71529ff7f24114b85d8b2a5ab1c6ac, type: 3}
-  DefaultActionPoints: 4
-  MaxHealth: 100
+  characterCreatorIcon: {fileID: 21300000, guid: 1247e8f0ed78b223a972eb58a9fc9750, type: 3}
+  DefaultActionPoints: 1
+  MaxHealth: 25
   abilities:
   - {fileID: 11400000, guid: 73c7f7f7adbc29e47b15a9d1be4ffa28, type: 2}
-  - {fileID: 11400000, guid: f2369a6c38ca42e40a817a9ce3040364, type: 2}
-  - {fileID: 11400000, guid: 7437a1d86c673f24c8057cd8401da99e, type: 2}
-  - {fileID: 11400000, guid: 16b9ef225868ee543929e39f4e61dd64, type: 2}
+  - {fileID: 11400000, guid: 3ee33e701fbebb84a8a698abbcdc9e06, type: 2}

@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Class_RangerSnipe
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileAbility
   DisplayName: Snipe
-  Icon: {fileID: 0}
+  Icon: {fileID: -977365011, guid: 031dc54038b37206f922a513894480da, type: 3}
   damageAmount: 10
   range: 3
+  projectileCount: 1
+  delayBetweenProjectiles: 0.2
   cost:
     actionPointsCost: 1

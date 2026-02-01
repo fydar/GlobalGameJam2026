@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Class_WarriorRally
   m_EditorClassIdentifier: Assembly-CSharp::RallyAbility
   DisplayName: Rally
-  Icon: {fileID: 0}
+  Icon: {fileID: 1930087479, guid: 031dc54038b37206f922a513894480da, type: 3}
   totalCost:
     actionPointsCost: 1
   jumpHeight: 1

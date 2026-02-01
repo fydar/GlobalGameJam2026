@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Class_WarriorSlam
   m_EditorClassIdentifier: Assembly-CSharp::LineDamageAbility
   DisplayName: Slam
-  Icon: {fileID: 0}
+  Icon: {fileID: 1846744450, guid: 031dc54038b37206f922a513894480da, type: 3}
   damageAmount: 15
   lineLength: 3
   cost:

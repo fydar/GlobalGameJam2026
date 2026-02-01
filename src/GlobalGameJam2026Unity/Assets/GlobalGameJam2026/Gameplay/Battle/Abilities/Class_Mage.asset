@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: Class_Mage
   m_EditorClassIdentifier: Assembly-CSharp::Class
   displayName: Mage
+  characterName: Bubbles
   healthBarIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  characterCreatorIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  characterCreatorIcon: {fileID: 21300000, guid: 5a0efed9e4589ec6b97f211e2ac66643, type: 3}
+  DefaultActionPoints: 3
+  MaxHealth: 100
   abilities:
   - {fileID: 11400000, guid: 73c7f7f7adbc29e47b15a9d1be4ffa28, type: 2}
-  - {fileID: 11400000, guid: f2369a6c38ca42e40a817a9ce3040364, type: 2}
+  - {fileID: 11400000, guid: 1e384c241bf00724fa8d786dc210769b, type: 2}
+  - {fileID: 11400000, guid: 99a2fc5a4af779e45b7d6545d0dee4ea, type: 2}
+  - {fileID: 11400000, guid: 9b0ce39fafecfe143ad0375bba575fa3, type: 2}

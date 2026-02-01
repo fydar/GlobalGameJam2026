@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b6601b891c85f24584b2aeaebf90b30, type: 3}
+  m_Name: Class_MageFireball
+  m_EditorClassIdentifier: Assembly-CSharp::FireballAbility
+  DisplayName: Fireball
+  Icon: {fileID: -1158450987, guid: 031dc54038b37206f922a513894480da, type: 3}
+  impactDamage: 20
+  splashDamage: 15
+  range: 3
+  cost:
+    actionPointsCost: 2

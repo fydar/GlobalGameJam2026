@@ -9,14 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcacbb0ae6593324eaf00e1c99ac4af5, type: 3}
-  m_Name: Class_RangerBarrage
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileAbility
-  DisplayName: Snipe
+  m_Script: {fileID: 11500000, guid: 029a178465aeb5c4cae58a8d7d78855e, type: 3}
+  m_Name: Class_RangerHailOfArrows
+  m_EditorClassIdentifier: Assembly-CSharp::HailOfArrowsAbility
+  DisplayName: Hail
   Icon: {fileID: -1953254090, guid: 031dc54038b37206f922a513894480da, type: 3}
-  damageAmount: 10
-  range: 3
-  projectileCount: 1
-  delayBetweenProjectiles: 0.2
+  damageAmount: 15
+  castRange: 3
   cost:
-    actionPointsCost: 1
+    actionPointsCost: 4

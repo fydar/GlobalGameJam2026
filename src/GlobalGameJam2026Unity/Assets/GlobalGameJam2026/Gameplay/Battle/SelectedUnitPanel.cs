@@ -1,5 +1,8 @@
+using System.Xml;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class SelectedUnitPanel : MonoBehaviour
 {
@@ -9,6 +12,16 @@ public class SelectedUnitPanel : MonoBehaviour
 
     [SerializeField] private GameObjectPool<SpellButton> spellButtonPool;
 
+    [SerializeField] private RectTransform actionPointsHolder;
+    [SerializeField] private GameObjectPool<RectTransform> actionPointsChit;
+
+    [SerializeField] public Image healthFill;
+    [SerializeField] public Image classIcon;
+    [SerializeField] public TextMeshProUGUI nameLabel;
+    [SerializeField] public TextMeshProUGUI healthText;
+
+    private Combatant combatant;
+
     private void Awake()
     {
         spellButtonPool.Initialise(spellButtonHolder);
@@ -16,6 +29,7 @@ public class SelectedUnitPanel : MonoBehaviour
 
     public void Render(Combatant combatant)
     {
+        this.combatant = combatant;
         spellButtonPool.ReturnAll();
 
         gameObject.SetActive(true);
@@ -32,6 +46,24 @@ public class SelectedUnitPanel : MonoBehaviour
             if (i == 0)
             {
                 EventSystem.current.SetSelectedGameObject(spellButton.button.gameObject);
+            }
+        }
+    }
+
+    public void Update()
+    {
+        if (combatant != null)
+        {
+            healthFill.fillAmount = (float)combatant.Health / combatant.characterClass.MaxHealth;
+            classIcon.sprite = combatant.characterClass.characterCreatorIcon;
+            nameLabel.text = combatant.characterClass.displayName;
+            healthText.text = $"{combatant.Health} / {combatant.characterClass.MaxHealth}";
+
+            actionPointsChit.ReturnAll();
+
+            for (int i = 0; i < combatant.ActionPoints; i++)
+            {
+                actionPointsChit.Grab(actionPointsHolder);
             }
         }
     }
