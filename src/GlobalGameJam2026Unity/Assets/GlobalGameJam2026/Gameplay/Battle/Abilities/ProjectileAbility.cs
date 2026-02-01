@@ -2,82 +2,61 @@ using GlobalGameJam2026.Gameplay.Overworld.PlayerController;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-[CreateAssetMenu(menuName = "Abilities/Projectile Attack")]
-public class ProjectileAbility : Ability
+[CreateAssetMenu(menuName = "Abilities/Projectile Damage")]
+public class ProjectileDamageAbility : Ability
 {
+    [Header("Stats")]
     public int damageAmount;
     public int range;
+    public int projectileCount = 1;
+    public float delayBetweenProjectiles = 0.2f;
     public Ability_FlatActionPoints cost;
 
     public override void ConfigureHandle(AbilityHandle abilityHandle)
     {
-        // 1. Show all 4 firing lanes
+        // 1. Show all possible lines, stopping at any blocker (Ally or Enemy)
         abilityHandle.BuildReticule = (reticle) =>
         {
             var map = abilityHandle.Combatant.Battle.Map;
             var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
+            var myTeam = abilityHandle.Combatant.Team;
 
-            // Show full threat range in all 4 directions
-            reticle.AddToReticle(map.GetLine(origin, OrthogonalDirection.Up, range, false), 3);
-            reticle.AddToReticle(map.GetLine(origin, OrthogonalDirection.Down, range, false), 3);
-            reticle.AddToReticle(map.GetLine(origin, OrthogonalDirection.Left, range, false), 3);
-            reticle.AddToReticle(map.GetLine(origin, OrthogonalDirection.Right, range, false), 3);
+            OrthogonalDirection[] dirs = { OrthogonalDirection.Up, OrthogonalDirection.Down, OrthogonalDirection.Left, OrthogonalDirection.Right };
+
+            foreach (var dir in dirs)
+            {
+                var fullLine = map.GetLine(origin, dir, range, false);
+                foreach (var tile in fullLine)
+                {
+                    if (tile.occupant != null)
+                    {
+                        // If it's an enemy, it's a valid target marker. If ally, it's just a blocker.
+                        int iconIndex = (tile.occupant.Team != myTeam) ? 3 : 2;
+                        reticle.AddToReticle(tile, iconIndex);
+                        break;
+                    }
+                    reticle.AddToReticle(tile, 3);
+                }
+            }
         };
 
-        abilityHandle.CanPreview = () =>
-        {
-            return abilityHandle.Combatant.ActionPoints >= cost.actionPointsCost;
-        };
+        abilityHandle.CanPreview = () => abilityHandle.Combatant.ActionPoints >= cost.actionPointsCost;
 
+        // 2. Preview: Only highlight if the first thing hit is an enemy
         abilityHandle.BuildPreviewReticule = (reticle) =>
         {
-            if (abilityHandle.HoveredTile != null)
+            var firstTarget = GetFirstTargetInDirection(abilityHandle);
+
+            // Only show the preview reticle if the target is actually an enemy
+            if (firstTarget != null && firstTarget.Team != abilityHandle.Combatant.Team)
             {
-                var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
-                var target = abilityHandle.HoveredTile.LogicalPosition;
-
-                Vector2Int diff = target - origin;
-
-                // 1. Validation: Orthogonal and within range
-                bool isOrthogonal = (diff.x == 0 && diff.y != 0) || (diff.x != 0 && diff.y == 0);
-                bool inRange = Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.y)) <= range;
-
-                if (isOrthogonal && inRange)
-                {
-                    var dir = OrthogonalDirection.FromVector2(new Vector2(diff.x, diff.y));
-                    var fullLine = abilityHandle.Combatant.Battle.Map.GetLine(origin, dir, range, false);
-
-                    // 2. Identify the first thing we hit in this direction
-                    BattleTile firstImpactTile = null;
-                    foreach (var tile in fullLine)
-                    {
-                        if (tile.occupant != null && tile.occupant.Team != abilityHandle.Combatant.Team)
-                        {
-                            firstImpactTile = tile;
-                            break;
-                        }
-                    }
-
-                    // 3. Logic: Is our HoveredTile an enemy, and is it blocked?
-                    var hoveredOccupant = abilityHandle.HoveredTile.occupant;
-                    bool isEnemyHovered = hoveredOccupant != null && hoveredOccupant.Team != abilityHandle.Combatant.Team;
-
-                    if (isEnemyHovered)
-                    {
-                        if (abilityHandle.HoveredTile == firstImpactTile)
-                        {
-                            // Valid Target: Show as highlighted (ID 1)
-                            reticle.AddToReticle(new[] { abilityHandle.HoveredTile }, 3);
-                        }
-                        else
-                        {
-                            // Blocked Target: Show as blocked (ID 2)
-                            reticle.AddToReticle(new[] { abilityHandle.HoveredTile }, 2);
-                        }
-                    }
-                }
+                reticle.AddToReticle(firstTarget.CurrentTile, 3);
+            }
+            else if (firstTarget != null)
+            {
+                // Optionally show the 'blocked' icon if an ally is the one in the way
+                reticle.AddToReticle(firstTarget.CurrentTile, 2);
             }
         };
 
@@ -85,55 +64,62 @@ public class ProjectileAbility : Ability
 
         IEnumerator Cast(AbilityHandle handle, BattleTile targetTile)
         {
-            handle.IsCapturedControl = false;
-            handle.IsCapturedGameflow = true;
+            var firstTarget = GetFirstTargetInDirection(handle);
 
-            var originPos = handle.Combatant.CurrentTile.LogicalPosition;
-            Vector2 diff = new Vector2(targetTile.LogicalPosition.x - originPos.x, targetTile.LogicalPosition.y - originPos.y);
-            var dir = OrthogonalDirection.FromVector2(diff);
-
-            var fullLine = handle.Combatant.Battle.Map.GetLine(originPos, dir, range, false);
-            var finalPath = GetProjectilePath(handle.Combatant, fullLine);
-
-            // Visual: Projectile travel
-            if (finalPath.Count > 0)
+            // --- Validation ---
+            // Cancel if no target, or if the first target hit is on the same team
+            if (firstTarget == null || firstTarget.Team == handle.Combatant.Team)
             {
-                // Here you would instantiate a projectile prefab and move it along the tiles
-                // For now, we simulate with a loop
-                foreach (var tile in finalPath)
-                {
-                    yield return new WaitForSeconds(0.05f); // Fast travel
+                Debug.Log("Invalid Target or Ally in way. Cast canceled.");
+                handle.IsCapturedControl = false;
+                handle.IsCapturedGameflow = false;
+                yield break;
+            }
 
-                    // If this tile has an enemy, stop and hit
-                    if (tile.occupant != null && tile.occupant.Team != handle.Combatant.Team)
-                    {
-                        // tile.occupant.TakeDamage(damageAmount);
-                        Debug.Log($"Projectile hit {tile.occupant.name}!");
-                        break; // Stop travel on impact
-                    }
+            // --- Execution ---
+            handle.Combatant.ActionPoints -= cost.actionPointsCost;
+
+            for (int i = 0; i < projectileCount; i++)
+            {
+                Debug.Log($"Projectile {i + 1} hit {firstTarget.name}!");
+                firstTarget.TakeDamage(damageAmount);
+
+                if (i < projectileCount - 1)
+                {
+                    yield return new WaitForSeconds(delayBetweenProjectiles);
                 }
             }
 
+            handle.IsCapturedControl = false;
             handle.IsCapturedGameflow = false;
         }
     }
 
-    /// <summary>
-    /// Processes a line of tiles and truncates it at the first tile containing an enemy.
-    /// </summary>
-    private List<BattleTile> GetProjectilePath(Combatant shooter, BattleTile[] fullLine)
+    private Combatant GetFirstTargetInDirection(AbilityHandle handle)
     {
-        List<BattleTile> path = new List<BattleTile>();
-        foreach (var tile in fullLine)
-        {
-            path.Add(tile);
+        if (handle.HoveredTile == null) return null;
 
-            // Stop the path if we hit a unit that isn't on our team
-            if (tile.occupant != null && tile.occupant.Team != shooter.Team)
+        var map = handle.Combatant.Battle.Map;
+        var origin = handle.Combatant.CurrentTile.LogicalPosition;
+        var hoverPos = handle.HoveredTile.LogicalPosition;
+
+        Vector2Int diff = hoverPos - origin;
+        bool isOrthogonal = (diff.x == 0 && diff.y != 0) || (diff.x != 0 && diff.y == 0);
+
+        if (!isOrthogonal) return null;
+
+        var dir = OrthogonalDirection.FromVector2(new Vector2(diff.x, diff.y));
+        var line = map.GetLine(origin, dir, range, false);
+
+        foreach (var tile in line)
+        {
+            if (tile.occupant != null)
             {
-                break;
+                // Returns the first occupant found (could be ally or enemy)
+                return tile.occupant;
             }
         }
-        return path;
+
+        return null;
     }
 }

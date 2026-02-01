@@ -29,7 +29,7 @@ public class MeleeAttackAbility : Ability
                 }
             }
 
-            reticle.AddToReticle(validTargets.ToArray(), 2);
+            reticle.AddToReticle(validTargets.ToArray(), 3);
         };
 
         abilityHandle.CanPreview = () =>
@@ -55,36 +55,31 @@ public class MeleeAttackAbility : Ability
                 }
             }
 
-            reticle.AddToReticle(validTargets.ToArray(), 2);
+            reticle.AddToReticle(validTargets.ToArray(), 3);
         };
 
         abilityHandle.CastCoroutine = Cast;
 
         IEnumerator Cast(AbilityHandle handle, BattleTile target)
         {
+            if (target.occupant == null)
+            {
+                Debug.Log("Melee attack missed! No target present.");
+                yield break;
+            }
+
+            // --- Execution ---
+            handle.Combatant.ActionPoints -= cost.actionPointsCost;
+
             handle.IsCapturedControl = false;
             handle.IsCapturedGameflow = true;
-
-            // Face the target (optional visual polish)
-            Vector3 direction = (target.transform.position - handle.Combatant.transform.position).normalized;
-            if (direction != Vector3.zero)
-            {
-                handle.Combatant.transform.forward = new Vector3(direction.x, 0, direction.z);
-            }
 
             // Quick "Anticipation" pause
             foreach (var time in new TimedLoop(0.15f)) yield return time;
 
             // Apply damage if there is an occupant
-            if (target.occupant != null)
-            {
-                //target.occupant.TakeDamage(damageAmount);
-                Debug.Log($"Melee hit on {target.occupant.name} for {damageAmount}!");
-            }
-            else
-            {
-                Debug.Log("Whiffed! No occupant on target tile.");
-            }
+            Debug.Log($"Melee hit on {target.occupant.name} for {damageAmount}!");
+            target.occupant.TakeDamage(damageAmount);
 
             // "Follow-through" pause
             foreach (var time in new TimedLoop(0.1f)) yield return time;

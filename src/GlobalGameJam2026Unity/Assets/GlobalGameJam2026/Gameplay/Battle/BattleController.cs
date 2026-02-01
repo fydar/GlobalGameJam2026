@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Cinemachine;
@@ -16,12 +17,16 @@ public class BattleController : MonoBehaviour
     [SerializeField] private SelectedAbilityPanel selectedAbilityPanel;
     [SerializeField] private CinemachineImpulseSource selectImpulse;
     [SerializeField] private Animator endTurnButton;
+    [SerializeField] private Animator turnBannerAnimator;
 
     [SerializeField] private InputActionReference cycleForward;
     [SerializeField] private InputActionReference cycleBackward;
 
     [SerializeField] private PlayerTeam playerTeam;
     [SerializeField] private EnemyTeam enemyTeam;
+    [SerializeField] private Team currentTeam;
+
+    public bool EndTurnPressed = false;
 
     public IEnumerable<Team> AllTeams
     {
@@ -127,14 +132,53 @@ public class BattleController : MonoBehaviour
         yield return null;
         Debug.Log("Battle is running");
 
+        foreach (var team in AllTeams)
+        {
+            foreach (var combatant in team.FieldedCombatants)
+            {
+                combatant.Health = combatant.characterClass.MaxHealth;
+            }
+        }
+
+        int currentPlayerId = 1;
         while (true)
         {
-            var currentTeam = playerTeam;
+            if (currentPlayerId == 0)
+            {
+                currentTeam = enemyTeam;
+                currentPlayerId = 1;
+            }
+            else
+            {
+                currentTeam = playerTeam;
+                currentPlayerId = 0;
+            }
+
+            foreach (var combatant in currentTeam.FieldedCombatants)
+            {
+                combatant.ActionPoints = combatant.characterClass.DefaultActionPoints;
+            }
+
+            turnBannerAnimator.SetInteger("Player", currentPlayerId + 1);
+            yield return new WaitForSeconds(1.0f);
+
+        endTurn:
+            if (EndTurnPressed)
+            {
+                EndTurnPressed = false;
+                CapturingAbility = null;
+                SelectedCombatant = null;
+                continue;
+            }
 
         nounitselected:
             // No Selected Combatant Mode
             while (true)
             {
+                if (EndTurnPressed)
+                {
+                    goto endTurn;
+                }
                 if (SelectedCombatant != null)
                 {
                     break;
@@ -155,6 +199,10 @@ public class BattleController : MonoBehaviour
             // Selection Loop
             while (true)
             {
+                if (EndTurnPressed)
+                {
+                    goto endTurn;
+                }
                 if (SelectedCombatant == null)
                 {
                     goto nounitselected;
@@ -178,6 +226,7 @@ public class BattleController : MonoBehaviour
                     SelectedCombatant = currentTeam.FieldedCombatants[currentIndex];
                 }
 
+
                 foreach (var abilityHandle in SelectedCombatant.activeAbilities)
                 {
                     if (abilityHandle.IsClicked)
@@ -189,6 +238,7 @@ public class BattleController : MonoBehaviour
                     }
                 }
 
+                RenderReticule(null);
                 foreach (var abilityHandle in SelectedCombatant.activeAbilities)
                 {
                     if (abilityHandle.IsButtonHovered)
@@ -208,6 +258,10 @@ public class BattleController : MonoBehaviour
             // Ability Loop
             while (true)
             {
+                if (EndTurnPressed)
+                {
+                    goto endTurn;
+                }
                 if (Keyboard.current.escapeKey.wasPressedThisFrame)
                 {
                     CapturingAbility = null;
@@ -260,10 +314,17 @@ public class BattleController : MonoBehaviour
                 for (int y = 0; y < Map.Height; y++)
                 {
                     var tile = Map[x, y];
-                    var reticuleTile = reticuleBuilder.Reticule.Find(rt => rt.Tile == tile);
-                    if (reticuleTile.Tile != null)
+                    if (reticuleBuilder != null)
                     {
-                        tile.SetReticuleState(reticuleTile.Mode);
+                        var reticuleTile = reticuleBuilder.Reticule.Find(rt => rt.Tile == tile);
+                        if (reticuleTile.Tile != null)
+                        {
+                            tile.SetReticuleState(reticuleTile.Mode);
+                        }
+                        else
+                        {
+                            tile.SetReticuleState(0);
+                        }
                     }
                     else
                     {
@@ -292,7 +353,7 @@ public class BattleController : MonoBehaviour
             }
             else
             {
-                if (playerTeam.FieldedCombatants.Contains(battleTile.occupant))
+                if (currentTeam.FieldedCombatants.Contains(battleTile.occupant))
                 {
                     // Setting the property automatically handles the UI and Tile state
                     SelectedCombatant = battleTile.occupant;
@@ -303,5 +364,16 @@ public class BattleController : MonoBehaviour
 
     public void OnEndTurnButtonSubmit()
     {
+        EndTurnPressed = true;
+    }
+
+    internal void HandleCombatantDefeated(Combatant combatant)
+    {
+        foreach (var team in AllTeams)
+        {
+            team.FieldedCombatants.Remove(combatant);
+        }
+        combatant.CurrentTile.occupant = null;
+        Destroy(combatant.gameObject);
     }
 }

@@ -9,12 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f16535cfcbd97874c8578472540ddeb6, type: 3}
-  m_Name: Slam
-  m_EditorClassIdentifier: Assembly-CSharp::LineDamageAbility
-  DisplayName: Slam
+  m_Script: {fileID: 11500000, guid: 2fd94749f59effd42b7b6218a358a692, type: 3}
+  m_Name: Class_HealerRecall
+  m_EditorClassIdentifier: Assembly-CSharp::SummonAbility
+  DisplayName: Recall
   Icon: {fileID: 0}
-  damageAmount: 15
-  lineLength: 3
   cost:
-    actionPointsCost: 1
+    actionPointsCost: 2
+  launchHeight: 10
+  airTime: 0.4
+  waitTime: 0.2
