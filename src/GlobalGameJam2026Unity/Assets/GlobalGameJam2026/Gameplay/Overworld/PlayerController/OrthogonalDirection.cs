@@ -46,6 +46,11 @@ namespace GlobalGameJam2026.Gameplay.Overworld.PlayerController
             return new Vector2(X, Y);
         }
 
+        public Vector2Int ToVector2Int()
+        {
+            return new Vector2Int(X, Y);
+        }
+
         public override string ToString()
         {
             return $"(X:{X}, Y:{Y})";

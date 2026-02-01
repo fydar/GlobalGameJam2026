@@ -3,6 +3,11 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public class GameState
+{
+    // public Combatant[] playerTeam;
+}
+
 public class Host : MonoBehaviour
 {
     private StashingSceneManager stashingSceneManager;
@@ -23,13 +28,21 @@ public class Host : MonoBehaviour
     {
         yield return bootLoad;
 
-        var overworldLoad = stashingSceneManager.LoadSceneAsync(1);
-        yield return overworldLoad;
+        // var overworldLoad = stashingSceneManager.LoadSceneAsync(1);
+        // yield return overworldLoad;
+        // 
+        // var overworld = GetRootComponent<Overworld>(overworldLoad.Scene);
+        // SceneManager.SetActiveScene(overworldLoad.Scene);
+        // 
+        // yield return overworld.Run();
 
-        var overworld = GetRootComponent<Overworld>(overworldLoad.Scene);
-        SceneManager.SetActiveScene(overworldLoad.Scene);
 
-        yield return overworld.Run();
+        var battleLoad = stashingSceneManager.LoadSceneAsync(2);
+
+        var battle = GetRootComponent<BattleController>(battleLoad.Scene);
+        SceneManager.SetActiveScene(battleLoad.Scene);
+
+        yield return battle.RunBattle();
     }
 
     private T GetRootComponent<T>(Scene scene)

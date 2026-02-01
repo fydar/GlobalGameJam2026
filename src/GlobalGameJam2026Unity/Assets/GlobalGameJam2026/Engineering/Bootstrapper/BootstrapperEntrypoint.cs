@@ -19,7 +19,10 @@ public static class BootstrapperEntrypoint
 #if UNITY_EDITOR
     private static void ApplicationQuitting()
     {
-        Object.DestroyImmediate(host.gameObject);
+        if (host != null && host.gameObject != null)
+        {
+            Object.DestroyImmediate(host.gameObject);
+        }
     }
 #endif
 }

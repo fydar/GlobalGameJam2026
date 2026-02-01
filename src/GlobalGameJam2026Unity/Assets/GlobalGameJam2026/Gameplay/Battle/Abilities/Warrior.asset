@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6027a515c93a9704a9e68d456e72b927, type: 3}
+  m_Name: Warrior
+  m_EditorClassIdentifier: Assembly-CSharp::Class
+  displayName: Warrior
+  healthBarIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  characterCreatorIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  abilities:
+  - {fileID: 11400000, guid: 73c7f7f7adbc29e47b15a9d1be4ffa28, type: 2}
+  - {fileID: 11400000, guid: 41546e3dcb569bc4697e5c04487c0b6d, type: 2}
+  - {fileID: 11400000, guid: 2d81f197e8af3514596fc4b9e15a2815, type: 2}
+  - {fileID: 11400000, guid: b3b8cef7ba95f024eb30cc8ef113d860, type: 2}
+  - {fileID: 11400000, guid: f2369a6c38ca42e40a817a9ce3040364, type: 2}
