@@ -10,39 +10,38 @@ public class SummonAbility : Ability
     [Header("Settings")]
     public Ability_FlatActionPoints cost;
     public float launchHeight = 10f;
-    public float airTime = 0.4f; // Time spent going up and down
-    public float waitTime = 0.2f; // Time spent "off-screen"
+    public float airTime = 0.4f;
+    public float waitTime = 0.2f;
 
     public override void ConfigureHandle(AbilityHandle abilityHandle)
     {
-        // 1. Logic: Allies are targets (1), Free spots are ignored, Blocked spots are (2)
+        // 1. Logic: Allies get Reticle 1, Blocked adjacent spots get Reticle 2
         abilityHandle.BuildReticule = (reticle) =>
         {
             var map = abilityHandle.Combatant.Battle.Map;
             var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
+            var myTeam = abilityHandle.Combatant.Team;
 
-            // Mark all adjacent tiles
+            // Highlight blocked adjacent tiles first
             foreach (var pos in GetAdjacentPositions(origin))
             {
                 var tile = map[pos.x, pos.y];
-                if (tile == null) continue;
-
-                if (tile.occupant != null)
+                if (tile != null && tile.occupant != null && tile.occupant.Team != abilityHandle.Combatant.Team)
                 {
-                    // If occupant is an ally, it's a valid target (1)
-                    // If occupant is an enemy, it's blocked (2)
-                    int index = (tile.occupant.Team == abilityHandle.Combatant.Team) ? 1 : 2;
-                    reticle.AddToReticle(tile, index);
+                    reticle.AddToReticle(tile, 2); // Show blocked icon on occupied neighbors
                 }
-                else
+            }
+
+            // Highlight all summonable allies on the field with Reticle 1
+            foreach (var ally in myTeam.FieldedCombatants)
+            {
+                if (ally != abilityHandle.Combatant)
                 {
-                    // Technically free, but not a target for summoning
-                    // You mentioned showing unfree spots as blocked
+                    reticle.AddToReticle(ally.CurrentTile, 1);
                 }
             }
         };
 
-        // 2. CanPreview: Only if AP is sufficient AND there is at least one free adjacent slot
         abilityHandle.CanPreview = () =>
         {
             bool hasAP = abilityHandle.Combatant.ActionPoints >= cost.actionPointsCost;
@@ -50,25 +49,27 @@ public class SummonAbility : Ability
             return hasAP && hasFreeSlot;
         };
 
-        // 3. Preview: Highlight the targeted ally or show blocked if hovering an enemy/empty
+        // 2. Preview: Specific focus on the hovered ally or blocked status
         abilityHandle.BuildPreviewReticule = (reticle) =>
         {
             if (abilityHandle.HoveredTile == null) return;
 
             var tile = abilityHandle.HoveredTile;
-            if (tile.occupant != null && tile.occupant.Team == abilityHandle.Combatant.Team)
+            var myTeam = abilityHandle.Combatant.Team;
+
+            if (tile.occupant != null)
             {
-                // Is this tile adjacent to the healer?
-                float dist = Vector2Int.Distance(tile.LogicalPosition, abilityHandle.Combatant.CurrentTile.LogicalPosition);
-                if (dist <= 1.1f) // Basic adjacency check
+                // If it's an ally, highlight them as the selected target
+                if (tile.occupant.Team == myTeam && tile.occupant != abilityHandle.Combatant)
                 {
                     reticle.AddToReticle(tile, 1);
-                    return;
+                }
+                else
+                {
+                    // If it's an enemy or self, show blocked
+                    reticle.AddToReticle(tile, 2);
                 }
             }
-
-            // Otherwise, show as blocked/invalid
-            reticle.AddToReticle(tile, 2);
         };
 
         abilityHandle.CastCoroutine = Cast;
@@ -76,7 +77,7 @@ public class SummonAbility : Ability
 
     private IEnumerator Cast(AbilityHandle handle, BattleTile targetTile)
     {
-        // Validate target is an ally
+        // --- Validation ---
         if (targetTile.occupant == null || targetTile.occupant.Team != handle.Combatant.Team)
         {
             Debug.Log("Summon Canceled: Target is not an ally.");
@@ -84,7 +85,6 @@ public class SummonAbility : Ability
             yield break;
         }
 
-        // Validate we have a place to put them
         var freeTiles = GetFreeAdjacentTiles(handle);
         if (freeTiles.Count == 0)
         {
@@ -104,25 +104,25 @@ public class SummonAbility : Ability
         Vector3 landPos = landingTile.transform.position;
         Vector3 landPeakPos = landPos + Vector3.up * launchHeight;
 
+        // --- Execution ---
         // 1. Launch Up
-        ally.CurrentTile.occupant = null; // Remove from current tile
+        ally.CurrentTile.occupant = null;
         foreach (var time in new TimedLoop(airTime))
         {
             ally.transform.position = Vector3.Lerp(startPos, peakPos, time);
             yield return time;
         }
 
-        // 2. Wait in the heavens
         yield return new WaitForSeconds(waitTime);
 
-        // 3. Drop Down to new position
+        // 2. Drop Down
         foreach (var time in new TimedLoop(airTime))
         {
             ally.transform.position = Vector3.Lerp(landPeakPos, landPos, time);
             yield return time;
         }
 
-        // 4. Finalize
+        // 3. Finalize
         ally.CurrentTile = landingTile;
         landingTile.occupant = ally;
         ally.transform.position = landPos;

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2fd94749f59effd42b7b6218a358a692, type: 3}
-  m_Name: Class_HealerSummon
+  m_Name: Class_HealerRecall
   m_EditorClassIdentifier: Assembly-CSharp::SummonAbility
-  DisplayName: Summon
+  DisplayName: Recall
   Icon: {fileID: 0}
   cost:
     actionPointsCost: 2
