@@ -55,8 +55,17 @@ public class MassHealAbility : Ability
 
         IEnumerator Cast(AbilityHandle handle, BattleTile target)
         {
+            if (target.occupant == null || handle.Combatant.Team != target.occupant.Team)
+            {
+                Debug.Log("Invalid target for Mass Heal.");
+                yield break;
+            }
+
             handle.IsCapturedControl = false;
             handle.IsCapturedGameflow = true;
+
+            // --- Execution ---
+            handle.Combatant.ActionPoints -= cost.actionPointsCost;
 
             // Optional: Visual effect "Charge" time
             foreach (var time in new TimedLoop(0.4f))
@@ -70,10 +79,7 @@ public class MassHealAbility : Ability
             foreach (var ally in allies)
             {
                 // Assuming Combatant has a Heal method (standard for GGJ projects)
-                // ally.Heal(healAmount); 
-
-                // If you don't have a Heal method, you can manually adjust HP:
-                // ally.CurrentHP = Mathf.Min(ally.MaxHP, ally.CurrentHP + healAmount);
+                ally.HealDamage(healAmount); 
 
                 Debug.Log($"Healed {ally.name} for {healAmount}.");
 

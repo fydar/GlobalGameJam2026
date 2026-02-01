@@ -9,7 +9,9 @@ public class Combatant : MonoBehaviour
 
     public List<AbilityHandle> activeAbilities = new();
 
-    public int ActionPoints { get; internal set; } = 5;
+    public int ActionPoints = 3;
+    public int Health =  100;
+
     public BattleController Battle { get; internal set; }
     public Team Team { get; set; }
 
@@ -21,6 +23,25 @@ public class Combatant : MonoBehaviour
             var handle = new AbilityHandle(this, ability);
             ability.ConfigureHandle(handle);
             activeAbilities.Add(handle);
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Health -= damage;
+        if (Health <= 0)
+        {
+            Health = 0;
+            Battle.HandleCombatantDefeated(this);
+        }
+    }
+
+    public void HealDamage(int damage)
+    {
+        Health += damage;
+        if (Health > characterClass.MaxHealth)
+        {
+            Health = characterClass.MaxHealth;
         }
     }
 }

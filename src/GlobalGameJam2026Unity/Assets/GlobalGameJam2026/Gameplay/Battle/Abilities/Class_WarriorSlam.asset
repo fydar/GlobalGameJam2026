@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f16535cfcbd97874c8578472540ddeb6, type: 3}
-  m_Name: Slam
+  m_Name: Class_WarriorSlam
   m_EditorClassIdentifier: Assembly-CSharp::LineDamageAbility
   DisplayName: Slam
   Icon: {fileID: 0}
   damageAmount: 15
   lineLength: 3
   cost:
-    actionPointsCost: 1
+    actionPointsCost: 2

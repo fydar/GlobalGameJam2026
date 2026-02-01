@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcacbb0ae6593324eaf00e1c99ac4af5, type: 3}
-  m_Name: Snipe
+  m_Name: Class_RangerSnipe
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileAbility
   DisplayName: Snipe
   Icon: {fileID: 0}
