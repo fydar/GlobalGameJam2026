@@ -24,21 +24,34 @@ public class LineDamageAbility : Ability
             reticle.AddToReticle(map.GetLine(origin, OrthogonalDirection.Right, lineLength, false), 3);
         };
 
+        abilityHandle.CanPreview = () =>
+        {
+            return abilityHandle.Combatant.ActionPoints >= cost.actionPointsCost;
+        };
+
         // 2. Preview only the line currently pointed at by the mouse
         abilityHandle.BuildPreviewReticule = (reticle) =>
         {
             if (abilityHandle.HoveredTile != null)
             {
+                var map = abilityHandle.Combatant.Battle.Map;
                 var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
                 var target = abilityHandle.HoveredTile.LogicalPosition;
 
-                // Calculate direction from combatant to hovered tile
-                Vector2 diff = new Vector2(target.x - origin.x, target.y - origin.y);
-                if (diff.magnitude > 0)
+                // 1. Calculate the relative difference
+                Vector2Int diff = target - origin;
+
+                // 2. Validate: Is the tile strictly on an orthogonal axis and within range?
+                bool isOrthogonal = (diff.x == 0 && diff.y != 0) || (diff.x != 0 && diff.y == 0);
+                bool inRange = Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.y)) <= lineLength;
+
+                // 3. Only draw if it's a valid "Line" tile
+                if (isOrthogonal && inRange)
                 {
-                    var dir = OrthogonalDirection.FromVector2(diff);
-                    var line = abilityHandle.Combatant.Battle.Map.GetLine(origin, dir, lineLength, false);
-                    reticle.AddToReticle(line, 1); // Highlight active target line
+                    var dir = OrthogonalDirection.FromVector2(new Vector2(diff.x, diff.y));
+                    var line = map.GetLine(origin, dir, lineLength, false);
+
+                    reticle.AddToReticle(line, 3); // Highlight active target line
                 }
             }
         };

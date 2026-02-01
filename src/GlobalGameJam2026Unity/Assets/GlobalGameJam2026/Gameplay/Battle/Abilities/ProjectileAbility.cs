@@ -26,7 +26,11 @@ public class ProjectileAbility : Ability
             reticle.AddToReticle(map.GetLine(origin, OrthogonalDirection.Right, range, false), 3);
         };
 
-        // 2. Preview the trajectory, stopping at the first enemy
+        abilityHandle.CanPreview = () =>
+        {
+            return abilityHandle.Combatant.ActionPoints >= cost.actionPointsCost;
+        };
+
         abilityHandle.BuildPreviewReticule = (reticle) =>
         {
             if (abilityHandle.HoveredTile != null)
@@ -34,15 +38,45 @@ public class ProjectileAbility : Ability
                 var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
                 var target = abilityHandle.HoveredTile.LogicalPosition;
 
-                Vector2 diff = new Vector2(target.x - origin.x, target.y - origin.y);
-                if (diff.magnitude > 0)
+                Vector2Int diff = target - origin;
+
+                // 1. Validation: Orthogonal and within range
+                bool isOrthogonal = (diff.x == 0 && diff.y != 0) || (diff.x != 0 && diff.y == 0);
+                bool inRange = Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.y)) <= range;
+
+                if (isOrthogonal && inRange)
                 {
-                    var dir = OrthogonalDirection.FromVector2(diff);
+                    var dir = OrthogonalDirection.FromVector2(new Vector2(diff.x, diff.y));
                     var fullLine = abilityHandle.Combatant.Battle.Map.GetLine(origin, dir, range, false);
 
-                    // Filter the line to stop at the first enemy
-                    var finalLine = GetProjectilePath(abilityHandle.Combatant, fullLine);
-                    reticle.AddToReticle(finalLine.ToArray(), 1);
+                    // 2. Identify the first thing we hit in this direction
+                    BattleTile firstImpactTile = null;
+                    foreach (var tile in fullLine)
+                    {
+                        if (tile.occupant != null && tile.occupant.Team != abilityHandle.Combatant.Team)
+                        {
+                            firstImpactTile = tile;
+                            break;
+                        }
+                    }
+
+                    // 3. Logic: Is our HoveredTile an enemy, and is it blocked?
+                    var hoveredOccupant = abilityHandle.HoveredTile.occupant;
+                    bool isEnemyHovered = hoveredOccupant != null && hoveredOccupant.Team != abilityHandle.Combatant.Team;
+
+                    if (isEnemyHovered)
+                    {
+                        if (abilityHandle.HoveredTile == firstImpactTile)
+                        {
+                            // Valid Target: Show as highlighted (ID 1)
+                            reticle.AddToReticle(new[] { abilityHandle.HoveredTile }, 3);
+                        }
+                        else
+                        {
+                            // Blocked Target: Show as blocked (ID 2)
+                            reticle.AddToReticle(new[] { abilityHandle.HoveredTile }, 2);
+                        }
+                    }
                 }
             }
         };

@@ -47,10 +47,6 @@ public class BattleController : MonoBehaviour
             }
             if (selectedCombatant != null)
             {
-                if (selectedCombatant.CurrentTile != null)
-                {
-                    selectedCombatant.CurrentTile.SelectedCombatant = false;
-                }
                 selectedUnitPanel.Close();
             }
 
@@ -58,10 +54,6 @@ public class BattleController : MonoBehaviour
 
             if (selectedCombatant != null)
             {
-                if (selectedCombatant.CurrentTile != null)
-                {
-                    selectedCombatant.CurrentTile.SelectedCombatant = true;
-                }
                 selectedUnitPanel.Render(selectedCombatant);
                 selectImpulse.GenerateImpulse();
             }
@@ -86,6 +78,10 @@ public class BattleController : MonoBehaviour
             {
                 selectedUnitPanel.Close();
                 selectedAbilityPanel.Render(capturingAbility);
+            }
+            else if (selectedCombatant != null)
+            {
+                selectedUnitPanel.Render(selectedCombatant);
             }
         }
     }
@@ -188,6 +184,7 @@ public class BattleController : MonoBehaviour
                     {
                         abilityHandle.IsClicked = false;
                         CapturingAbility = abilityHandle;
+                        EventSystem.current.SetSelectedGameObject(selectedCombatant.CurrentTile.Button.gameObject);
                         goto abilityselected;
                     }
                 }
@@ -222,6 +219,11 @@ public class BattleController : MonoBehaviour
                     goto unitselected;
                 }
 
+                if (CapturingAbility.IsCapturedGameflow)
+                {
+                    goto abilityplaying;
+                }
+
                 BattleTile hoveredTile = null;
                 if (EventSystem.current.currentSelectedGameObject != null)
                 {
@@ -233,6 +235,19 @@ public class BattleController : MonoBehaviour
                 CapturingAbility.BuildPreviewReticule?.Invoke(reticuleBuilder);
 
                 RenderReticule(reticuleBuilder);
+
+                yield return null;
+            }
+
+        abilityplaying:
+            // Ability Loop
+            while (true)
+            {
+                if (!CapturingAbility.IsCapturedGameflow)
+                {
+                    CapturingAbility = null;
+                    goto unitselected;
+                }
 
                 yield return null;
             }
@@ -263,16 +278,30 @@ public class BattleController : MonoBehaviour
     {
         if (battleTile != null)
         {
-            if (playerTeam.FieldedCombatants.Contains(battleTile.occupant))
+            if (CapturingAbility != null)
             {
-                // Setting the property automatically handles the UI and Tile state
-                SelectedCombatant = battleTile.occupant;
+                if (CapturingAbility.IsCapturedGameflow)
+                {
+                    return;
+                }
+                StartCoroutine(CapturingAbility.CastCoroutine(CapturingAbility, battleTile));
+                if (!CapturingAbility.IsCapturedGameflow)
+                {
+                    CapturingAbility = null;
+                }
+            }
+            else
+            {
+                if (playerTeam.FieldedCombatants.Contains(battleTile.occupant))
+                {
+                    // Setting the property automatically handles the UI and Tile state
+                    SelectedCombatant = battleTile.occupant;
+                }
             }
         }
     }
 
     public void OnEndTurnButtonSubmit()
     {
-
     }
 }

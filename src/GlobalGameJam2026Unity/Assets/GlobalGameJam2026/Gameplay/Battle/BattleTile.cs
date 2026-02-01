@@ -1,7 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BattleTile : MonoBehaviour
+public class BattleTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Animator animator;
     [SerializeField] private Button button;
@@ -13,10 +14,9 @@ public class BattleTile : MonoBehaviour
 
     public Vector2Int LogicalPosition { get; set; }
 
-    public bool SelectedCombatant
+    private void Update()
     {
-        get => animator.GetBool("SelectedCombatant");
-        set => animator.SetBool("SelectedCombatant", value);
+        animator.SetBool("SelectedCombatant", battleController.SelectedCombatant != null && battleController.SelectedCombatant == occupant);
     }
 
     public void OnSubmit()
@@ -27,6 +27,19 @@ public class BattleTile : MonoBehaviour
     internal void SetReticuleState(int mode)
     {
         animator.SetInteger("Reticule", mode);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        EventSystem.current.SetSelectedGameObject(button.gameObject);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (EventSystem.current.currentSelectedGameObject == button.gameObject)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
     }
 }
 

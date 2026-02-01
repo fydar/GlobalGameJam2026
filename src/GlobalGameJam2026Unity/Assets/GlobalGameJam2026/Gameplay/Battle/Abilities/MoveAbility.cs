@@ -12,6 +12,12 @@ public class MoveAbility : Ability
         // 1. Define the "Available Area" (Where the player can choose to go)
         abilityHandle.BuildReticule = (reticle) =>
         {
+            if (abilityHandle.Combatant.ActionPoints < costPerTile.actionPointsCost)
+            {
+                reticle.AddToReticle(abilityHandle.Combatant.CurrentTile, 2); // Blocking ID
+                return;
+            }
+
             var (walkable, blocking) = GetWalkableTiles(
                 abilityHandle.Combatant.Battle.Map,
                 abilityHandle.Combatant.CurrentTile.LogicalPosition,
@@ -20,6 +26,11 @@ public class MoveAbility : Ability
 
             reticle.AddToReticle(walkable, 1); // Walkable ID
             reticle.AddToReticle(blocking, 2); // Blocking ID
+        };
+
+        abilityHandle.CanPreview = () =>
+        {
+            return abilityHandle.Combatant.ActionPoints >= costPerTile.actionPointsCost;
         };
 
         // 2. Define the "Path Preview" (The specific route to the hovered tile)
@@ -78,7 +89,6 @@ public class MoveAbility : Ability
 
         IEnumerator Cast(AbilityHandle handle, BattleTile target)
         {
-            handle.IsCapturedControl = false;
             handle.IsCapturedGameflow = true;
 
             var path = FindPath(
@@ -86,32 +96,44 @@ public class MoveAbility : Ability
                 handle.Combatant.CurrentTile.LogicalPosition,
                 target.LogicalPosition);
 
-            // Verify path exists and isn't empty
             if (path != null && path.Count > 0)
             {
-                // Clear occupancy at the start of the move
+                // 1. Clear initial occupancy
                 handle.Combatant.CurrentTile.occupant = null;
 
                 foreach (var tile in path)
                 {
+                    // 2. Check if we can still afford this specific step
+                    // (Important if something external modifies AP mid-move)
+                    if (handle.Combatant.ActionPoints < costPerTile.actionPointsCost)
+                    {
+                        Debug.Log("Movement interrupted: Out of AP!");
+                        break;
+                    }
+
                     var startWorldPos = handle.Combatant.transform.position;
                     var endWorldPos = tile.transform.position;
 
-                    foreach (var time in new TimedLoop(0.2f))
+                    // 3. Perform the visual lerp
+                    foreach (var time in new TimedLoop(0.4f))
                     {
                         handle.Combatant.transform.position = Vector3.Lerp(startWorldPos, endWorldPos, time);
                         yield return time;
                     }
 
-                    // Update logical position mid-walk
+                    // 4. LOGIC UPDATE: Subtract AP after the step is complete
+                    handle.Combatant.ActionPoints -= costPerTile.actionPointsCost;
+
+                    // 5. Update logical position
                     handle.Combatant.CurrentTile = tile;
                 }
 
-                // Finalize occupancy at destination
+                // 6. Finalize occupancy at the tile where the unit actually stopped
                 handle.Combatant.CurrentTile.occupant = handle.Combatant;
             }
 
             handle.IsCapturedGameflow = false;
+            handle.IsCapturedControl = false;
         }
     }
 

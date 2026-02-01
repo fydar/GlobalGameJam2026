@@ -12,13 +12,13 @@ public class SpellButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public AbilityHandle abilityHandle;
 
-    private bool hovered = false;
-
     private void Update()
     {
         if (abilityHandle != null)
         {
-            abilityHandle.IsButtonHovered = hovered || EventSystem.current.currentSelectedGameObject == button.gameObject;
+            abilityHandle.IsButtonHovered = EventSystem.current.currentSelectedGameObject == button.gameObject;
+
+            button.interactable = abilityHandle.CanPreview();
         }
     }
 
@@ -43,11 +43,15 @@ public class SpellButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        hovered = true;
+        EventSystem.current.SetSelectedGameObject(button.gameObject);
     }
+
     public void OnPointerExit(PointerEventData eventData)
     {
-        hovered = false;
+        if (EventSystem.current.currentSelectedGameObject == button.gameObject)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
     }
 }
 

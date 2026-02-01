@@ -28,6 +28,11 @@ public class MassHealAbility : Ability
             reticle.AddToReticle(allyTiles.ToArray(), 4);
         };
 
+        abilityHandle.CanPreview = () =>
+        {
+            return abilityHandle.Combatant.ActionPoints >= cost.actionPointsCost;
+        };
+
         // 2. Preview reticle (could highlight them more intensely or show a different color)
         abilityHandle.BuildPreviewReticule = (reticle) =>
         {
@@ -37,10 +42,12 @@ public class MassHealAbility : Ability
             foreach (var ally in allies)
             {
                 if (ally.CurrentTile != null)
+                {
                     allyTiles.Add(ally.CurrentTile);
+                }
             }
 
-            // Using ID 3 or a specific preview ID to show "Ready to Heal"
+            // Using ID 1 for a "Friendly/Positive" highlight
             reticle.AddToReticle(allyTiles.ToArray(), 4);
         };
 

@@ -44,6 +44,8 @@ public class AbilityHandle
 
     public Action<ReticuleBuilder> BuildPreviewReticule;
 
+    public Func<bool> CanPreview;
+
     public Func<AbilityHandle, BattleTile, IEnumerator> CastCoroutine;
 
     public AbilityHandle(Combatant combatant, Ability ability)

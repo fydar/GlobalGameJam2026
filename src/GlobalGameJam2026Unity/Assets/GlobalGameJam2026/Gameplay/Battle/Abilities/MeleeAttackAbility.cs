@@ -11,34 +11,51 @@ public class MeleeAttackAbility : Ability
 
     public override void ConfigureHandle(AbilityHandle abilityHandle)
     {
-        // 1. Show the 4 adjacent tiles (Up, Down, Left, Right)
+        // 1. Show threat range (filtering out allies)
         abilityHandle.BuildReticule = (reticle) =>
         {
             var map = abilityHandle.Combatant.Battle.Map;
             var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
-
-            // GetDiamond with distance 1 on a square grid gives exactly the 4 orthogonal neighbors
             var adjacentTiles = map.GetDiamond(origin, 1, false);
 
-            // Using ID 2 (red/threat) for the attackable tiles
-            reticle.AddToReticle(adjacentTiles, 2);
-        };
+            List<BattleTile> validTargets = new List<BattleTile>();
 
-        // 2. Preview the specific tile being targeted
-        abilityHandle.BuildPreviewReticule = (reticle) =>
-        {
-            if (abilityHandle.HoveredTile != null)
+            foreach (var tile in adjacentTiles)
             {
-                var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
-                var target = abilityHandle.HoveredTile.LogicalPosition;
-
-                // Ensure the hovered tile is actually adjacent before showing preview
-                int distance = Mathf.Abs(origin.x - target.x) + Mathf.Abs(origin.y - target.y);
-                if (distance == 1)
+                // Logic: Add if empty OR if it's an enemy. (Exclude if occupant is on our team)
+                if (tile.occupant == null || tile.occupant.Team != abilityHandle.Combatant.Team)
                 {
-                    reticle.AddToReticle(new[] { abilityHandle.HoveredTile }, 1);
+                    validTargets.Add(tile);
                 }
             }
+
+            reticle.AddToReticle(validTargets.ToArray(), 2);
+        };
+
+        abilityHandle.CanPreview = () =>
+        {
+            return abilityHandle.Combatant.ActionPoints >= cost.actionPointsCost;
+        };
+
+        // 2. Preview only the specific tile being hovered
+        abilityHandle.BuildPreviewReticule = (reticle) =>
+        {
+            var map = abilityHandle.Combatant.Battle.Map;
+            var origin = abilityHandle.Combatant.CurrentTile.LogicalPosition;
+            var adjacentTiles = map.GetDiamond(origin, 1, false);
+
+            List<BattleTile> validTargets = new List<BattleTile>();
+
+            foreach (var tile in adjacentTiles)
+            {
+                // Logic: Add if empty OR if it's an enemy. (Exclude if occupant is on our team)
+                if (tile.occupant == null || tile.occupant.Team != abilityHandle.Combatant.Team)
+                {
+                    validTargets.Add(tile);
+                }
+            }
+
+            reticle.AddToReticle(validTargets.ToArray(), 2);
         };
 
         abilityHandle.CastCoroutine = Cast;
