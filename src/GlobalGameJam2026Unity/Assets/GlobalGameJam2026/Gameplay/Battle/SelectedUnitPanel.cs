@@ -56,7 +56,7 @@ public class SelectedUnitPanel : MonoBehaviour
         {
             healthFill.fillAmount = (float)combatant.Health / combatant.characterClass.MaxHealth;
             classIcon.sprite = combatant.characterClass.characterCreatorIcon;
-            nameLabel.text = combatant.characterClass.displayName;
+            nameLabel.text = combatant.characterClass.characterName;
             healthText.text = $"{combatant.Health} / {combatant.characterClass.MaxHealth}";
 
             actionPointsChit.ReturnAll();

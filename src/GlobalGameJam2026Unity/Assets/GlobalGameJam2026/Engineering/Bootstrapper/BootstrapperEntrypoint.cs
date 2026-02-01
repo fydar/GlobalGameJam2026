@@ -11,7 +11,9 @@ public static class BootstrapperEntrypoint
         host = hostGameObject.AddComponent<Host>();
         Object.DontDestroyOnLoad(hostGameObject);
 
+#if UNITY_EDITOR
         Application.quitting += ApplicationQuitting;
+#endif
 
         host.Initialize();
     }
